@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SMS Spam Detection</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            width: 400px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        p {
+            color: #64748b;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            margin-top: 15px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>SMS Spam Detector</h1>
+
+        <p>Check whether your SMS message is Spam or Not Spam.</p>
+
+        <textarea id="message"
+            placeholder="Enter your SMS message here..."></textarea>
+
+        <button onclick="checkMessage()">Predict</button>
+
+        <div id="result"></div>
+
+    </div>
+
+    <script>
+        async function checkMessage() {
+
+            const message = document.getElementById("message").value;
+
+            if (message.trim() === "") {
+                document.getElementById("result").innerText =
+                    "Please enter a message.";
+                return;
+            }
+
+            document.getElementById("result").innerText =
+                "Checking message...";
+
+            try {
+
+                const response = await fetch(
+                    "/predict",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            message: message
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Unable to connect to the API.");
+                }
+
+                document.getElementById("result").innerText =
+                    "Prediction: " + data.prediction;
+
+            } catch (error) {
+
+                document.getElementById("result").innerText =
+                    error.message || "Unable to connect to the API.";
+
+            }
+
+        }
+    </script>
+
+</body>
+
+</html>
